@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "565304800533",
+    "project_id": "aquae-ca006",
+    "storage_bucket": "aquae-ca006.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:565304800533:android:c2083b2018a9165831251c",
+        "android_client_info": {
+          "package_name": "com.aquae.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNOd7sovF-CJ4SkJlSGhsuPdMNv-jbAX0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
