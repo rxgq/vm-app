@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../constants.dart';
+
 class RegisterTextField extends StatefulWidget {
   const RegisterTextField({super.key, required this.text, required this.icon});
 
@@ -25,7 +27,7 @@ class _RegisterTextFieldState extends State<RegisterTextField> {
             BoxShadow(
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 2,
-              blurRadius: 5,
+              blurRadius: 10,
               offset: const Offset(0, 3),
             ),
           ],
@@ -42,13 +44,13 @@ class _RegisterTextFieldState extends State<RegisterTextField> {
               ),
             ),
             SizedBox(
-              width: 200,
+              width: 220,
               child: TextField(
                 obscureText: widget.text == "password" && !isPasswordVisible,
                 decoration: InputDecoration(
                   hintText: widget.text,
                   hintStyle: const TextStyle(
-                    color: Color.fromARGB(255, 196, 196, 196)
+                    color: secondaryTextColor
                   ),
                   contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                   border: InputBorder.none
