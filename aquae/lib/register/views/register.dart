@@ -9,11 +9,18 @@ class Register extends StatelessWidget {
     return const Scaffold(
       backgroundColor: Colors.white,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          SizedBox(height: 128),
           Text(
-            "REGISTER"
+            "REGISTER",
+            style: TextStyle(
+              color: Color.fromARGB(255, 197, 197, 197),
+              fontSize: 20,
+              fontWeight: FontWeight.bold
+            ),
           ),
+          SizedBox(height: 128),
           RegisterTextField(text: "email", icon: Icons.email),
           RegisterTextField(text: "password", icon: Icons.password),
         ],
