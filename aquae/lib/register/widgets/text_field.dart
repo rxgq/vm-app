@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import '../../constants.dart';
 
 class RegisterTextField extends StatefulWidget {
-  const RegisterTextField({super.key, required this.text, required this.icon});
+  const RegisterTextField({super.key, required this.text, required this.icon, required this.controller});
 
   final String text;
-  final IconData icon;
+  final IconData? icon;
+  final TextEditingController controller;
 
   @override
   State<RegisterTextField> createState() => _RegisterTextFieldState();
@@ -46,6 +47,8 @@ class _RegisterTextFieldState extends State<RegisterTextField> {
             SizedBox(
               width: 220,
               child: TextField(
+                cursorColor: Colors.grey,
+                controller: widget.controller,
                 obscureText: widget.text == "password" && !isPasswordVisible,
                 decoration: InputDecoration(
                   hintText: widget.text,
