@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'home/lunch.dart';
+
 void main() async {
   runApp(const App());
 }
@@ -11,7 +13,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Login()
+      home: LunchView()
     );
   }
 }
