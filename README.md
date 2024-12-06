@@ -1,3 +1,0 @@
-# typr
-
-vim typing practice
