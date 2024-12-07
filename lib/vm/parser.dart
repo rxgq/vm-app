@@ -10,7 +10,7 @@ final class VirtualMachineParser {
 
   static const Map<String, int> _opcodeMap = {
     'nop':  0x00,
-    'halt': 0x01,
+    'hlt': 0x01,
     'push': 0x02,
     'pop':  0x03,
     'add':  0x04,
@@ -29,16 +29,38 @@ final class VirtualMachineParser {
   }) : _source = source;
 
   VMResult parse() {
+    int currentToken = 0;
     while (_current < _source.length) {
       if (_source[_current].trim().isEmpty) {
         _current++;
         continue;
       }
 
-      final VMResult result = switch (_isAlpha(_source[_current])) {
-        true => _parseOperation(),
+      final result = switch (_isAlpha(_source[_current])) {
+        true  => _parseLabel(currentToken),
+        _     => VMResult.ok()
+      };
+      currentToken++;
+
+      if (!result.isSuccess) return result;
+
+      if (_current < _source.length) {
+        _current++;
+      }
+    } 
+
+    _current = 0;
+    while (_current < _source.length) {
+      if (_source[_current].trim().isEmpty) {
+        _current++;
+        continue;
+      }
+
+      final result = switch (_isAlpha(_source[_current])) {
+        true  => _parseOperation(),
         false => _parseNumber(),
       };
+
       if (!result.isSuccess) return result;
 
       if (_current < _source.length) {
@@ -46,7 +68,22 @@ final class VirtualMachineParser {
       }
     }
 
+
     return VMResult.ok(value: _tokens);
+  }
+
+  VMResult _parseLabel(int _currentToken) {
+    int start = _current;
+    while (_current < _source.length && (_isAlpha(_source[_current]) || _source[_current] == ':')) {
+      _current++;
+    }
+
+    final stmt = _source.substring(start, _current);
+    if (stmt[stmt.length - 1] == ':') {
+      return parseLabel(stmt.substring(0, stmt.length - 1), _currentToken);
+    }
+
+    return VMResult.ok();
   }
 
   VMResult _parseOperation() {
@@ -56,8 +93,10 @@ final class VirtualMachineParser {
     }
 
     final stmt = _source.substring(start, _current);
+    
     if (stmt[stmt.length - 1] == ':') {
-      return parseLabel(stmt.substring(0, stmt.length - 1));
+      _tokens.add(0x00);
+      return VMResult.ok();
     }
 
     if (_labels.keys.contains(stmt)) {
@@ -73,9 +112,8 @@ final class VirtualMachineParser {
     return VMResult.ok();
   }
 
-  VMResult parseLabel(String label) {
-    _tokens.add(0x00);
-    _labels.addAll({label: _tokens.length - 1});
+  VMResult parseLabel(String label, int position) {
+    _labels.addAll({label: position});
 
     return VMResult.ok();
   }

@@ -1,12 +1,10 @@
-import 'dart:io';
-
 import 'package:allium/vm/parser.dart';
 import 'package:allium/vm/result.dart';
 import 'package:allium/vm/stack.dart';
 import 'package:allium/vm/value.dart';
 
 abstract interface class VM {
-  void execute(String _program);
+  void execute(String program);
 }
 
 final class VirtualMachine implements VM {
@@ -30,13 +28,18 @@ final class VirtualMachine implements VM {
   late final Map<int, Function> _isa;
 
   // number of instructions to execute per second
-  static const _execSpeed = 16;
+  static const _execSpeed = 128;
 
   // displays a verbose execution output if 'true'
-  static const bool _logInfo = true;
+  static const bool _logInfo = false;
 
-  final Function(VMStack, List<String>) emitData;
+  // emits the current vm state
+  final Function(VMStack, List<String>, List<String>) emitData;
+  
+  // awaits user input, called with _in
   final Future<String> Function() getInput;
+
+  final List<String> stdout = [];
 
   VirtualMachine({
     required this.emitData,
@@ -74,7 +77,12 @@ final class VirtualMachine implements VM {
       _ip++;
 
       await Future.delayed(Duration(milliseconds: (1000 / _execSpeed).round()));
-      emitData(_stack, _programBytes.map((byte) => "0x${byte.toRadixString(16).padLeft(2, '0')}").toList());
+      
+      var byteCode =  _programBytes
+        .map((byte) => "0x${byte.toRadixString(16)
+        .padLeft(2, '0')}").toList();
+
+      emitData(_stack, byteCode, stdout);
     }
 
     _stack.dump();
@@ -209,7 +217,9 @@ final class VirtualMachine implements VM {
   VMResult _out() {
     if (_stack.isEmpty) return VMResult.stackUnderflow();
 
-    if (_logInfo) print("OUT: ${(_stack.peek as Number).value}");
+    var out = (_stack.peek as Number).value;
+    stdout.add(out.toString());
+
     return VMResult.ok();
   }
 

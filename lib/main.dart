@@ -1,4 +1,4 @@
-import 'package:allium/home/home.dart';
+import 'package:allium/home/views/home.dart';
 import 'package:flutter/material.dart';
 
 void main() {
