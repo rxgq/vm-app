@@ -9,7 +9,6 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-
   // counts down from 10, then halts at 0
   static const program = [
     0x02, 0xb,  // push 11
@@ -20,19 +19,11 @@ class _HomeViewState extends State<HomeView> {
     0x01        // halt
   ];
 
-  static const divideByZeroTest = [
-    0x02, 0x01, 0x02, 0x00, 0x07
-  ];
+  static const loopTest = "push 11 push 1 sub out jnz 2 halt";
+  static const divideByZeroStr = "push 1 push 0 div";
 
   final vm = VirtualMachine(
-    programStr: """
-  push 11 
-  push 1 
-  sub 
-  out 
-  jnz 2 
-  halt
-"""
+    programStr: loopTest
   );
 
   @override

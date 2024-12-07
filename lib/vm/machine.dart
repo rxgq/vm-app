@@ -190,6 +190,8 @@ final class VirtualMachine implements VM {
   }
 
   VMResult _jz() {
+    if (_stack.isEmpty) return VMResult.stackUnderflow();
+
     if ((_stack.peek as Number).value != 0) {
       _ip++;
       return VMResult.ok();
@@ -200,6 +202,8 @@ final class VirtualMachine implements VM {
   }
 
   VMResult _jnz() {
+    if (_stack.isEmpty) return VMResult.stackUnderflow();
+
     if ((_stack.peek as Number).value == 0) {
       _ip++;
       return VMResult.ok();

@@ -14,7 +14,7 @@ final class VMResult<T> {
 
   final T? value;
 
-  static const errorPrefix = "VM_ERROR:";
+  static const _errorPrefix = "VM_ERROR:";
 
   VMResult._({
     required this.isSuccess,
@@ -32,43 +32,49 @@ final class VMResult<T> {
 
   static VMResult stackOverflow(int max) {
     return _err(VMError(
-      message: "$errorPrefix stack overflow, reached max items on stack: $max"
+      message: "$_errorPrefix stack overflow, reached max items on stack: $max"
     ));
   }
 
   static VMResult stackUnderflow() {
     return _err(VMError(
-      message: "$errorPrefix stack underflow, attempted to pop item on empty stack"
+      message: "$_errorPrefix stack underflow, attempted to pop or peek item on empty stack"
     ));
   }
 
   static VMResult expectedArgument(int op) {
     return _err(VMError(
-      message: "$errorPrefix expected argument after op: $op"
+      message: "$_errorPrefix expected argument after op: $op"
     ));
   }
 
   static VMResult expectedStackArgs(int argCount, int op) {
     return _err(VMError(
-      message: "$errorPrefix expected $argCount values on the stack to execute op: $op"
+      message: "$_errorPrefix expected $argCount values on the stack to execute op: $op"
     ));
   }
 
   static VMResult divideByZero() {
     return _err(VMError(
-      message: "$errorPrefix attempted to divide by zero"
+      message: "$_errorPrefix attempted to divide by zero"
     ));
   }
 
   static VMResult undefinedOperation(String op) {
     return _err(VMError(
-      message: "$errorPrefix undefined operation: '$op'"
+      message: "$_errorPrefix undefined operation: '$op'"
     ));
   }
 
   static VMResult undefinedOpCode(int op) {
     return _err(VMError(
-      message: "$errorPrefix undefined opcode: '$op'"
+      message: "$_errorPrefix undefined opcode: '$op'"
+    ));
+  }
+
+  static VMResult expectedNumberType(String type) {
+    return _err(VMError(
+      message: "$_errorPrefix expected number, got: '$type'"
     ));
   }
 }
