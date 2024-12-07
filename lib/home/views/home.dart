@@ -1,9 +1,12 @@
 import 'dart:async';
 
-import 'package:allium/home/widgets/allium_field.dart';
+import 'package:allium/home/widgets/common/allium_field.dart';
+import 'package:allium/home/widgets/vm/console.dart';
+import 'package:allium/home/widgets/vm/stack.dart';
+import 'package:allium/home/widgets/vm/stdout.dart';
 import 'package:flutter/material.dart';
 import '../../constants.dart';
-import 'package:allium/home/widgets/allium_button.dart';
+import 'package:allium/home/widgets/common/allium_button.dart';
 import 'package:allium/vm/machine.dart';
 import 'package:allium/vm/stack.dart';
 import 'package:allium/vm/value.dart';
@@ -27,9 +30,6 @@ class _HomeViewState extends State<HomeView> {
   void Function()? _resolveInput;
 
   late VirtualMachine vm;
-
-  static const double vmHeight = 280;
-  static const double consoleHeight = 140;
 
   bool _resetPressed = false;
   bool _isExecuting = false;
@@ -143,81 +143,39 @@ class _HomeViewState extends State<HomeView> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          _components(),
+                          _vmComponents(),
                           const Spacer(),
-                          _buildStack(),
+                          VMStackBox(stackValues: stackValues),
                         ],
                       ),
                     ),
-                    _outputConsole(),
+                    VMConsole(values: consoleOutputs)
                   ],
                 ),
-                _buildOutput(),
+                VMStdout(stdout: stdout),
               ],
             ),
-
-            Center(
-              child: SizedBox(
-                width: 720,
-                child: Row(
-                  children: [
-                    _displayStat("Executing", _isExecuting),
-                  ],
-                ),
-              ),
-            )
+            _vmStats()
           ],
         ),
       ),
     );
   }
 
-  Widget _displayStat(String name, dynamic value) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: Container(
-        width: 180,
-        height: 40,
-        decoration: BoxDecoration(
-          border: Border.all(color: lightGrey, width: 4),
-          borderRadius: BorderRadius.circular(4),
-          color: Colors.white,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              Text(
-                "$name: ",
-                style: font(
-                  fontSize: 12
-                ),
-              ),
-              Text(
-                value.toString(),
-                style: font(
-                  fontSize: 12
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _components() {
+  Widget _vmComponents() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
             AlliumField(
+              header: "code",
               maxLines: null,
               controller: codeController,
               hintText: "Enter code here..."
             ),
             AlliumField(
+              header: "bytecode",
               width: 292,
               maxLines: null,
               readonly: true,
@@ -262,92 +220,6 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildOutput() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Container(
-        width: 120,
-        height: vmHeight + consoleHeight + 8,
-        decoration: BoxDecoration(
-          border: Border.all(color: lightGrey, width: 4),
-          borderRadius: BorderRadius.circular(4),
-          color: Colors.white,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "stdout",
-                style: font(
-                  fontSize: 12
-                ),
-              ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Text(
-                      stdout.join("\n"),
-                      style: font(
-                        fontSize: 14, 
-                        color: Colors.black
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStack() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: 140,
-        height: vmHeight,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              for (var val in stackValues) 
-                _stackItem(val),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _stackItem(String val) {
-    return Padding(
-      padding: const EdgeInsets.all(4),
-      child: Container(
-        width: 140,
-        decoration: BoxDecoration(
-          color: lightGrey,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Text(val),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _execButton() {
     return AlliumButton(
       onTap: _onExec,
@@ -365,22 +237,47 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _outputConsole() {
+  Widget _vmStats() {
+    return Center(
+      child: SizedBox(
+        width: 720,
+        child: Row(
+          children: [
+            _displayStat("Executing", _isExecuting),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _displayStat(String name, dynamic value) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(right: 8),
       child: Container(
-        width: 600,
-        height: consoleHeight,
+        width: 180,
+        height: 40,
         decoration: BoxDecoration(
           border: Border.all(color: lightGrey, width: 4),
           borderRadius: BorderRadius.circular(4),
           color: Colors.white,
         ),
-        child: SingleChildScrollView(
+        child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(
-            consoleOutputs.join("\n"),
-            style: font(fontSize: 14, color: Colors.black),
+          child: Row(
+            children: [
+              Text(
+                "$name: ",
+                style: font(
+                  fontSize: 12
+                ),
+              ),
+              Text(
+                value.toString(),
+                style: font(
+                  fontSize: 12
+                ),
+              ),
+            ],
           ),
         ),
       ),

@@ -6,3 +6,6 @@ const lightGrey = Color.fromARGB(255, 244, 244, 244);
 const font = GoogleFonts.jetBrainsMono;
 
 const double buttonHeight = 34;
+
+const double vmHeight = 280;
+const double consoleHeight = 140;
