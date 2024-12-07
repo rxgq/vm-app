@@ -27,13 +27,29 @@ class _VMStackBoxState extends State<VMStackBox> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(4),
         ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              for (var val in widget.stackValues) 
-                _stackItem(val),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "stack",
+                style: font(
+                  fontSize: 12
+                ),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    for (var val in widget.stackValues) 
+                      _stackItem(val),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -41,7 +57,7 @@ class _VMStackBoxState extends State<VMStackBox> {
 
   Widget _stackItem(String val) {
     return Padding(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: Container(
         width: 140,
         decoration: BoxDecoration(

@@ -2,12 +2,16 @@ import 'package:allium/vm/parser.dart';
 import 'package:allium/vm/result.dart';
 import 'package:allium/vm/stack.dart';
 import 'package:allium/vm/value.dart';
+import 'package:allium/vm/vm_settings.dart';
 
 abstract interface class VM {
   void execute(String program);
 }
 
 final class VirtualMachine implements VM {
+
+  // virtual machine operative settings
+  final VmSettings _settings;
 
   // executable bytecode compiled from the program string
   late List<int> _programBytes;
@@ -16,7 +20,7 @@ final class VirtualMachine implements VM {
   final _stack = VMStack();
 
   // max number of items allowed on the virtual stack
-  static const _stackLimit = 16;
+  static const _stackLimit = 64;
 
   // a pointer to the current instruction in program
   int _ip = 0;
@@ -27,9 +31,6 @@ final class VirtualMachine implements VM {
   // Instruction Set Architecture
   late final Map<int, Function> _isa;
 
-  // number of instructions to execute per second
-  static const _execSpeed = 128;
-
   // displays a verbose execution output if 'true'
   static const bool _logInfo = false;
 
@@ -39,12 +40,14 @@ final class VirtualMachine implements VM {
   // awaits user input, called with _in
   final Future<String> Function() getInput;
 
-  final List<String> stdout = [];
+  // stores the accumulated results of _out operations
+  final List<String> _stdout = [];
 
   VirtualMachine({
     required this.emitData,
     required this.getInput,
-  }) {
+    required VmSettings settings
+  }) : _settings = settings {
     _isa = {
       0x00: _nop,
       0x01: _halt,
@@ -75,7 +78,7 @@ final class VirtualMachine implements VM {
         .map((byte) => "0x${byte.toRadixString(16)
         .padLeft(2, '0')}").toList();
 
-      var resetPressed = emitData(_stack, byteCode, stdout);
+      var resetPressed = emitData(_stack, byteCode, _stdout);
       if (resetPressed) break;
 
       var result = await _eval();
@@ -83,7 +86,7 @@ final class VirtualMachine implements VM {
 
       _ip++;
 
-      await Future.delayed(Duration(milliseconds: (1000 / _execSpeed).round()));
+      await Future.delayed(Duration(milliseconds: (1000 / _settings.executionSpeed).round()));
     }
 
     _stack.dump();
@@ -219,7 +222,7 @@ final class VirtualMachine implements VM {
     if (_stack.isEmpty) return VMResult.stackUnderflow();
 
     var out = (_stack.peek as Number).value;
-    stdout.add(out.toString());
+    _stdout.add(out.toString());
 
     return VMResult.ok();
   }

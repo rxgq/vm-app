@@ -9,6 +9,7 @@ class AlliumField extends StatefulWidget {
   final int? maxLines;
   final bool readonly;
   final String? header;
+  final int? maxLength;
 
   const AlliumField({
     super.key,
@@ -17,6 +18,7 @@ class AlliumField extends StatefulWidget {
     this.width = 120,
     this.height = 212,
     this.maxLines = 1,
+    this.maxLength,
     this.readonly = false,
     this.header
   });
@@ -69,10 +71,13 @@ class _AlliumFieldState extends State<AlliumField> {
         enabled: !widget.readonly,
         readOnly: widget.readonly,
         maxLines: widget.maxLines,
+        maxLength: widget.maxLength,
+        maxLengthEnforcement: null,
         style: font(
           fontSize: 12
         ),
         decoration: InputDecoration(
+          counterText: "",
           fillColor: Colors.white,
           contentPadding: const EdgeInsets.symmetric(
             vertical: 16.0, 

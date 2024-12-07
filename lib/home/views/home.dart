@@ -4,6 +4,7 @@ import 'package:allium/home/widgets/common/allium_field.dart';
 import 'package:allium/home/widgets/vm/console.dart';
 import 'package:allium/home/widgets/vm/stack.dart';
 import 'package:allium/home/widgets/vm/stdout.dart';
+import 'package:allium/vm/vm_settings.dart';
 import 'package:flutter/material.dart';
 import '../../constants.dart';
 import 'package:allium/home/widgets/common/allium_button.dart';
@@ -23,6 +24,8 @@ class _HomeViewState extends State<HomeView> {
   final byteCodeController = TextEditingController();
   final userInputController = TextEditingController();
 
+  final execSpeedController = TextEditingController();
+
   final List<String> stackValues = [];
   final List<String> consoleOutputs = [];
   final List<String> stdout = [];
@@ -41,23 +44,32 @@ class _HomeViewState extends State<HomeView> {
   }
 
   void _initializeVM() {
+    double speed = execSpeedController.text.isEmpty ? 0
+       : double.parse(execSpeedController.text);
+
+    final settings = VmSettings(
+      executionSpeed: speed
+    );
+
     vm = VirtualMachine(
+      settings: settings,
       emitData: _onDataEmit,
-      getInput: () async {
-        out("awaiting user input...");
-
-        final completer = Completer<String>();
-        void resolveInput() {
-          completer.complete(userInputController.text.trim());
-        }
-
-        _resolveInput = resolveInput;
-
-        return await completer.future;
-      },
+      getInput: _onGetInput,
     );
   }
 
+  Future<String> _onGetInput() async {
+    out("awaiting user input...");
+
+    final completer = Completer<String>();
+    void resolveInput() {
+      completer.complete(userInputController.text.trim());
+    }
+
+    _resolveInput = resolveInput;
+
+    return await completer.future;
+  }
 
   bool _onDataEmit(VMStack stack, List<String> bytes, List<String> out) {
     if (_resetPressed) {
@@ -96,6 +108,13 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future _onExec() async {
+
+    execSpeedController.text = "64";
+    if (int.tryParse(execSpeedController.text) == null) {
+      out("Execution Speed value must be an integer");
+      return;
+    }
+
     if (_isExecuting) return;
 
     _initializeVM();
@@ -155,7 +174,8 @@ class _HomeViewState extends State<HomeView> {
                 VMStdout(stdout: stdout),
               ],
             ),
-            _vmStats()
+            _vmStats(),
+            // _settingDisplay("Execution Speed", execSpeedController)
           ],
         ),
       ),
@@ -246,6 +266,39 @@ class _HomeViewState extends State<HomeView> {
             _displayStat("Executing", _isExecuting),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _settingDisplay(final String header, final TextEditingController controller) {
+    return Container(
+      width: 251,
+      height: 70,
+      decoration: BoxDecoration(
+        border: Border.all(color: lightGrey, width: 4),
+        borderRadius: BorderRadius.circular(4),
+        color: Colors.white,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text(
+              "$header:",
+              style: font(
+                fontSize: 14
+              ),
+            ),
+          ),
+          AlliumField(
+            maxLength: 3,
+            maxLines: 1,
+            width: 80,
+            height: buttonHeight + 24,
+            controller: controller
+          ),
+        ],
       ),
     );
   }

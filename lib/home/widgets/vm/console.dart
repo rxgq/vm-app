@@ -28,7 +28,7 @@ class _VMConsoleState extends State<VMConsole> {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             widget.values.join("\n"),
-            style: font(fontSize: 14, color: Colors.black),
+            style: font(fontSize: 12, color: Colors.black),
           ),
         ),
       ),
