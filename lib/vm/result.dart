@@ -8,29 +8,26 @@ final class VMError {
   });
 }
 
-final class VMResult {
+final class VMResult<T> {
   final bool isSuccess;
   final VMError? error;
+
+  final T? value;
 
   static const errorPrefix = "VM_ERROR:";
 
   VMResult._({
     required this.isSuccess,
-    required this.error
+    required this.error,
+    required this.value
   });
 
-  static VMResult ok() {
-    return VMResult._(isSuccess: true, error: null);
+  static VMResult ok<T>({T? value}) {
+    return VMResult._(isSuccess: true, error: null, value: value);
   }
 
   static VMResult _err(VMError error) {
-    return VMResult._(isSuccess: false, error: error);
-  }
-
-  static VMResult undefinedOpCode(int opCode) {
-    return _err(VMError(
-      message: "$errorPrefix undefined opcode: '$opCode'"
-    ));
+    return VMResult._(isSuccess: false, error: error, value: null);
   }
 
   static VMResult stackOverflow(int max) {
@@ -61,5 +58,17 @@ final class VMResult {
     return _err(VMError(
       message: "$errorPrefix attempted to divide by zero"
     ));
-  } 
+  }
+
+  static VMResult undefinedOperation(String op) {
+    return _err(VMError(
+      message: "$errorPrefix undefined operation: '$op'"
+    ));
+  }
+
+  static VMResult undefinedOpCode(int op) {
+    return _err(VMError(
+      message: "$errorPrefix undefined opcode: '$op'"
+    ));
+  }
 }

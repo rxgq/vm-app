@@ -1,3 +1,4 @@
+import 'package:allium/vm/parser.dart';
 import 'package:allium/vm/result.dart';
 import 'package:allium/vm/stack.dart';
 import 'package:allium/vm/value.dart';
@@ -12,7 +13,7 @@ final class VirtualMachine implements VM {
   final String _programStr;
 
   // executable bytecode compiled from the program string
-  List<int> _program = [];
+  late final List<int> _program;
 
   // virtual stack
   final _stack = VMStack();
@@ -30,22 +31,7 @@ final class VirtualMachine implements VM {
   late final Map<int, Function> _isa;
 
   // number of instructions to execute per second
-  static const _execSpeed = 4;
-
-  static const Map<String, int> _opcodeMap = {
-    'nop': 0x00,
-    'halt': 0x01,
-    'push': 0x02,
-    'pop': 0x03,
-    'add': 0x04,
-    'sub': 0x05,
-    'mul': 0x06,
-    'div': 0x07,
-    'jmp': 0x08,
-    'out': 0x09,
-    'jz': 0x0a,
-    'jnz': 0x0b,
-  };
+  static const _execSpeed = 32;
 
   VirtualMachine({
     required String programStr,
@@ -68,7 +54,11 @@ final class VirtualMachine implements VM {
 
   @override
   Future<VMResult> execute() async {
-    assemble();
+    final parser = VirtualMachineParser(source: _programStr);
+    final result = parser.parse();
+
+    if (!result.isSuccess) return result;
+    _program = result.value;
 
     while (!isEnd() && !_isHalted) {
       var result = _eval();
@@ -81,15 +71,6 @@ final class VirtualMachine implements VM {
 
     _stack.dump();
     return VMResult.ok();
-  }
-
-  void assemble() {
-    var statements = _programStr.split(' ');
-
-    for (final stmt in statements) {
-      final opcode = _opcodeMap[stmt];
-      _program.add(opcode ?? int.parse(stmt));
-    }
   }
 
   VMResult _eval() {

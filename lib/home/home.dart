@@ -25,7 +25,14 @@ class _HomeViewState extends State<HomeView> {
   ];
 
   final vm = VirtualMachine(
-    programStr: "push 11 push 1 sub out jnz 2 halt"
+    programStr: """
+  push 11 
+  push 1 
+  sub 
+  out 
+  jnz 2 
+  halt
+"""
   );
 
   @override
