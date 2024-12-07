@@ -34,7 +34,7 @@ final class VirtualMachine implements VM {
   static const bool _logInfo = false;
 
   // emits the current vm state
-  final Function(VMStack, List<String>, List<String>) emitData;
+  final bool Function(VMStack, List<String>, List<String>) emitData;
   
   // awaits user input, called with _in
   final Future<String> Function() getInput;
@@ -71,18 +71,19 @@ final class VirtualMachine implements VM {
     _programBytes = result.value;
 
     while (!isEnd() && !_isHalted) {
+      var byteCode =  _programBytes
+        .map((byte) => "0x${byte.toRadixString(16)
+        .padLeft(2, '0')}").toList();
+
+      var resetPressed = emitData(_stack, byteCode, stdout);
+      if (resetPressed) break;
+
       var result = await _eval();
       if (!result.isSuccess) return result;
 
       _ip++;
 
       await Future.delayed(Duration(milliseconds: (1000 / _execSpeed).round()));
-      
-      var byteCode =  _programBytes
-        .map((byte) => "0x${byte.toRadixString(16)
-        .padLeft(2, '0')}").toList();
-
-      emitData(_stack, byteCode, stdout);
     }
 
     _stack.dump();

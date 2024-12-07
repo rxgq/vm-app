@@ -31,6 +31,9 @@ class _HomeViewState extends State<HomeView> {
   static const double vmHeight = 280;
   static const double consoleHeight = 140;
 
+  bool _resetPressed = false;
+  bool _isExecuting = false;
+
   @override
   void initState() {
     super.initState();
@@ -41,8 +44,7 @@ class _HomeViewState extends State<HomeView> {
     vm = VirtualMachine(
       emitData: _onDataEmit,
       getInput: () async {
-        consoleOutputs.add("awaiting user input...");
-        setState(() {});
+        out("awaiting user input...");
 
         final completer = Completer<String>();
         void resolveInput() {
@@ -57,7 +59,11 @@ class _HomeViewState extends State<HomeView> {
   }
 
 
-  void _onDataEmit(VMStack stack, List<String> bytes, List<String> out) {
+  bool _onDataEmit(VMStack stack, List<String> bytes, List<String> out) {
+    if (_resetPressed) {
+      return true;
+    }
+
     setState(() {
       stackValues.clear();
       stackValues.addAll(stack.toList().map((item) => (item as Number).value.toString()));
@@ -66,31 +72,47 @@ class _HomeViewState extends State<HomeView> {
 
       stdout.clear();
       stdout.addAll(out);
+    });
 
-      print(stdout.length);
+    return false;
+  }
+
+  void out(String message) {
+    final timestamp = DateTime.now().toIso8601String().substring(11, 19);
+    setState(() {
+      consoleOutputs.add("[$timestamp] $message");
     });
   }
 
+
   void _resetVM() {
+    if (!_isExecuting) return;
+
+    _resetPressed = true;
+    _isExecuting = false;
+
     setState(() {
       _initializeVM();
-      consoleOutputs.clear();
       stdout.clear();
       stackValues.clear();
     });
   }
 
   Future _onExec() async {
-    var result = await vm.execute(codeController.text);
+    if (_isExecuting) return;
+    _resetVM();
 
-    if (!result.isSuccess) {
-      setState(() {
-        consoleOutputs.add(result.error!.message);
-        consoleOutputs.add("program finished exit code 1");
-      });
+    _isExecuting = true;
+    var result = await vm.execute(codeController.text);
+    _isExecuting = false;
+
+    _resetPressed = false;
+    if (!result.isSuccess || _resetPressed) {
+      out(result.error!.message);
+      out("program finished exit code 1");
     } 
     else {
-      consoleOutputs.add("program finished exit code 0");
+      out("program finished exit code 0");
     }
   }
 
@@ -99,35 +121,86 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Column(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  width: 600,
-                  height: vmHeight,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    color: lightGrey,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _components(),
-                      const Spacer(),
-                      _buildStack(),
-                    ],
-                  ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 600,
+                      height: vmHeight,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: lightGrey,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          _components(),
+                          const Spacer(),
+                          _buildStack(),
+                        ],
+                      ),
+                    ),
+                    _outputConsole(),
+                  ],
                 ),
-                _outputConsole(),
+                _buildOutput(),
               ],
             ),
-            _buildOutput()
+
+            Center(
+              child: SizedBox(
+                width: 720,
+                child: Row(
+                  children: [
+                    _displayStat("Executing", _isExecuting),
+                  ],
+                ),
+              ),
+            )
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _displayStat(String name, dynamic value) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Container(
+        width: 180,
+        height: 40,
+        decoration: BoxDecoration(
+          border: Border.all(color: lightGrey, width: 4),
+          borderRadius: BorderRadius.circular(4),
+          color: Colors.white,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Text(
+                "$name: ",
+                style: font(
+                  fontSize: 12
+                ),
+              ),
+              Text(
+                value.toString(),
+                style: font(
+                  fontSize: 12
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -212,13 +285,19 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
             ),
-            SingleChildScrollView(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                stdout.join("\n"),
-                style: font(
-                  fontSize: 14, 
-                  color: Colors.black
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Text(
+                      stdout.join("\n"),
+                      style: font(
+                        fontSize: 14, 
+                        color: Colors.black
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
