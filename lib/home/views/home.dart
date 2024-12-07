@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:allium/home/widgets/common/allium_dropdown.dart';
 import 'package:allium/home/widgets/common/allium_field.dart';
 import 'package:allium/home/widgets/operations/vm_operations.dart';
 import 'package:allium/home/widgets/vm/console.dart';
 import 'package:allium/home/widgets/vm/stack.dart';
 import 'package:allium/home/widgets/vm/stdout.dart';
 import 'package:allium/vm/machine/vm_settings.dart';
+import 'package:allium/vm/utils/program_mapper.dart';
 import 'package:flutter/material.dart';
 import '../../constants.dart';
 import 'package:allium/home/widgets/common/allium_button.dart';
@@ -109,7 +111,6 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future _onExec() async {
-
     execSpeedController.text = "64";
     if (int.tryParse(execSpeedController.text) == null) {
       out("Execution Speed value must be an integer");
@@ -123,17 +124,24 @@ class _HomeViewState extends State<HomeView> {
     stackValues.clear();
 
     _isExecuting = true;
-    var result = await vm.execute(codeController.text);
-    _isExecuting = false;
 
+    final startTime = DateTime.now();
+    var result = await vm.execute(codeController.text);
+    final endTime = DateTime.now();
+
+    _isExecuting = false;
     _resetPressed = false;
+
+    final elapsedTime = endTime.difference(startTime).inMilliseconds;
+
     if (!result.isSuccess || _resetPressed) {
       out(result.error!.message);
-      out("program finished exit code 1");
-    } 
-    else {
-      out("program finished exit code 0");
+      out("Program finished with exit code 1.");
+    } else {
+      out("Program finished with exit code 0.");
     }
+
+    out("Finished execution in ${elapsedTime}ms.");
   }
 
   @override
@@ -176,7 +184,12 @@ class _HomeViewState extends State<HomeView> {
                   VMStdout(stdout: stdout),
                 ],
               ),
-              _vmStats(),
+              Row(
+                children: [
+                  const SizedBox(width: 94),
+                  _programDropdown()
+                ],
+              ),
               const SizedBox(height: 80),
 
               const VmOperations(),
@@ -220,6 +233,18 @@ class _HomeViewState extends State<HomeView> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _programDropdown() {
+    return SizedBox(
+      width: 220, height: 40,
+      child: AlliumDropdown(
+        items: const ["cat program", "decrement counter"], 
+        onChanged: (item) {
+          codeController.text = ProgramMapper.mapProgramString(item ?? "");
+        }
+      ),
     );
   }
 
