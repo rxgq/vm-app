@@ -1,3 +1,5 @@
+import 'package:allium/constants.dart';
+
 import 'result.dart';
 
 final class VirtualMachineParser {
@@ -7,22 +9,6 @@ final class VirtualMachineParser {
   final _tokens = <int>[];
 
   final _labels = <String, int>{};
-
-  static const Map<String, int> _opcodeMap = {
-    'nop':  0x00,
-    'hlt': 0x01,
-    'push': 0x02,
-    'pop':  0x03,
-    'add':  0x04,
-    'sub':  0x05,
-    'mul':  0x06,
-    'div':  0x07,
-    'jmp':  0x08,
-    'out':  0x09,
-    'jz':   0x0a,
-    'jnz':  0x0b,
-    'in':   0x0c,
-  };
 
   VirtualMachineParser({
     required String source
@@ -104,11 +90,11 @@ final class VirtualMachineParser {
       return VMResult.ok();
     }
 
-    if (!_opcodeMap.containsKey(stmt)) {
+    if (!operations.any((x) => x.name == stmt)) {
       return VMResult.undefinedOperation(stmt);
     }
 
-    _tokens.add(_opcodeMap[stmt]!);
+    _tokens.add(operations.firstWhere((x) => x.name == stmt).opCode);
     return VMResult.ok();
   }
 

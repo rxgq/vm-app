@@ -21,7 +21,7 @@ class _VMStdoutState extends State<VMStdout> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Container(
-        width: 120,
+        width: stDoutWidth,
         height: vmHeight + consoleHeight + 8,
         decoration: BoxDecoration(
           border: Border.all(color: lightGrey, width: 4),

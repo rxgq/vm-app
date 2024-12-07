@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:allium/home/widgets/common/allium_field.dart';
+import 'package:allium/home/widgets/operations/vm_operations.dart';
 import 'package:allium/home/widgets/vm/console.dart';
 import 'package:allium/home/widgets/vm/stack.dart';
 import 'package:allium/home/widgets/vm/stdout.dart';
@@ -140,43 +141,48 @@ class _HomeViewState extends State<HomeView> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 600,
-                      height: vmHeight,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(4),
-                        color: lightGrey,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 180),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: vmWidth,
+                        height: vmHeight,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(4),
+                          color: lightGrey,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            _vmComponents(),
+                            const Spacer(),
+                            VMStackBox(stackValues: stackValues),
+                          ],
+                        ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          _vmComponents(),
-                          const Spacer(),
-                          VMStackBox(stackValues: stackValues),
-                        ],
-                      ),
-                    ),
-                    VMConsole(values: consoleOutputs)
-                  ],
-                ),
-                VMStdout(stdout: stdout),
-              ],
-            ),
-            _vmStats(),
-            // _settingDisplay("Execution Speed", execSpeedController)
-          ],
+                      VMConsole(values: consoleOutputs)
+                    ],
+                  ),
+                  VMStdout(stdout: stdout),
+                ],
+              ),
+              _vmStats(),
+              const SizedBox(height: 80),
+
+              const VmOperations(),
+              // _settingDisplay("Execution Speed", execSpeedController)
+            ],
+          ),
         ),
       ),
     );
