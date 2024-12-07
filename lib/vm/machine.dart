@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:allium/vm/parser.dart';
 import 'package:allium/vm/result.dart';
 import 'package:allium/vm/stack.dart';
@@ -16,7 +18,7 @@ final class VirtualMachine implements VM {
   final _stack = VMStack();
 
   // max number of items allowed on the virtual stack
-  static const _stackLimit = 64;
+  static const _stackLimit = 16;
 
   // a pointer to the current instruction in program
   int _ip = 0;
@@ -33,10 +35,12 @@ final class VirtualMachine implements VM {
   // displays a verbose execution output if 'true'
   static const bool _logInfo = true;
 
-  final Function(VMStack, List<int>) emitData;
+  final Function(VMStack, List<String>) emitData;
+  final Future<String> Function() getInput;
 
   VirtualMachine({
     required this.emitData,
+    required this.getInput,
   }) {
     _isa = {
       0x00: _nop,
@@ -51,6 +55,7 @@ final class VirtualMachine implements VM {
       0x09: _out,
       0x0a: _jz,
       0x0b: _jnz,
+      0x0c: _in,
     };
   }
 
@@ -63,20 +68,20 @@ final class VirtualMachine implements VM {
     _programBytes = result.value;
 
     while (!isEnd() && !_isHalted) {
-      var result = _eval();
+      var result = await _eval();
       if (!result.isSuccess) return result;
 
       _ip++;
 
       await Future.delayed(Duration(milliseconds: (1000 / _execSpeed).round()));
-      emitData(_stack, _programBytes);
+      emitData(_stack, _programBytes.map((byte) => "0x${byte.toRadixString(16).padLeft(2, '0')}").toList());
     }
 
     _stack.dump();
     return VMResult.ok();
   }
 
-  VMResult _eval() {
+  Future<VMResult> _eval() async {
     final instr = _programBytes[_ip];
     final handler = _isa[instr];
 
@@ -84,7 +89,7 @@ final class VirtualMachine implements VM {
       return VMResult.undefinedOpCode(instr);
     }
 
-    return handler();
+    return await handler();
   }
 
   bool isEnd() {
@@ -233,6 +238,20 @@ final class VirtualMachine implements VM {
     }
 
     _jmp();
+    return VMResult.ok();
+  }
+
+  Future<VMResult> _in() async {
+    if (_logInfo) print("IN");
+
+    final input = await getInput();
+    if (input.isEmpty) {
+      return VMResult.expectedArgument(_programBytes[_ip]);
+    }
+
+    final value = int.tryParse(input) ?? -1;
+
+    _stack.push(Number(value));
     return VMResult.ok();
   }
 }

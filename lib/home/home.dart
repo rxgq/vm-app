@@ -1,10 +1,12 @@
+import 'dart:async';
+
+import 'package:allium/home/allium_field.dart';
+import 'package:flutter/material.dart';
+import 'constants.dart';
 import 'package:allium/home/allium_button.dart';
 import 'package:allium/vm/machine.dart';
 import 'package:allium/vm/stack.dart';
 import 'package:allium/vm/value.dart';
-import 'package:flutter/material.dart';
-
-import 'constants.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -16,9 +18,12 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   final codeController = TextEditingController();
   final byteCodeController = TextEditingController();
+  final userInputController = TextEditingController();
 
   final List<String> stackValues = [];
   final List<String> consoleOutputs = [];
+  
+  void Function()? _resolveInput;
 
   late VirtualMachine vm;
 
@@ -30,20 +35,35 @@ class _HomeViewState extends State<HomeView> {
     _initializeVM();
   }
 
+
   void _initializeVM() {
     vm = VirtualMachine(
       emitData: _onDataEmit,
+      getInput: () async {
+        consoleOutputs.add("Awaiting user input...");
+        setState(() {});
+
+        final completer = Completer<String>();
+        void resolveInput() {
+          completer.complete(userInputController.text.trim());
+        }
+
+        _resolveInput = resolveInput;
+
+        return await completer.future;
+      },
     );
+
     stackValues.clear();
+    consoleOutputs.clear();
   }
 
-  void _onDataEmit(VMStack stack, List<int> bytes) {
+
+  void _onDataEmit(VMStack stack, List<String> bytes) {
     setState(() {
       stackValues.clear();
-      stackValues.addAll(stack.toList()
-        .map((item) => (item as Number).value.toString())
-      );
-      
+      stackValues.addAll(stack.toList().map((item) => (item as Number).value.toString()));
+
       byteCodeController.text = bytes.join(" ");
     });
   }
@@ -55,7 +75,7 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-  Future onExec() async {
+  Future _onExec() async {
     var result = await vm.execute(codeController.text);
 
     if (!result.isSuccess) {
@@ -88,8 +108,8 @@ class _HomeViewState extends State<HomeView> {
                     children: [
                       Row(
                         children: [
-                          _buildTextBox(codeController, hint: "Enter your code here..."),
-                          _buildTextBox(byteCodeController),
+                          AlliumField(controller: codeController, hintText: "Enter your code here..."),
+                          AlliumField(controller: byteCodeController),
                         ],
                       ),
                       const Spacer(),
@@ -102,16 +122,39 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ],
                   ),
-
                   const Spacer(),
                   _buildStack(),
                 ],
               ),
             ),
-            _outputConsole()
+            _outputConsole(),
+            const SizedBox(height: 16),
+            _userInputBox(),
+            _userInputButton(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _userInputButton() {
+    return AlliumButton(
+      onTap: () {
+        if (_resolveInput != null) {
+          _resolveInput!();
+          _resolveInput = null;
+        }
+      },
+      text: "Ok",
+    );
+  }
+
+  Widget _userInputBox() {
+    return AlliumField(
+      controller: userInputController,
+      hintText: "Enter user input here...",
+      width: 600,
+      height: 50,
     );
   }
 
@@ -125,14 +168,12 @@ class _HomeViewState extends State<HomeView> {
             padding: EdgeInsets.only(left: 8.0),
             child: Text(
               "Stack",
-              style: TextStyle(
-                fontSize: 18,
-                color: Colors.black
-              ),
+              style: TextStyle(fontSize: 18, color: Colors.black),
             ),
           ),
           Container(
-            width: 140, height: 238,
+            width: 140,
+            height: 238,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(4),
@@ -140,8 +181,7 @@ class _HomeViewState extends State<HomeView> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  for (var val in stackValues)
-                    _stackItem(val)
+                  for (var val in stackValues) _stackItem(val),
                 ],
               ),
             ),
@@ -163,39 +203,7 @@ class _HomeViewState extends State<HomeView> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Center(
-            child: Text(
-              val,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextBox(TextEditingController controller, {String? hint}) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: 120, height: 212,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
-          color: Colors.white,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: TextField(
-            maxLines: null,
-            controller: controller,
-            style: const TextStyle(
-              fontSize: 14,
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: hint,
-              hintStyle: TextStyle(
-                color: Colors.grey[400],
-              ),
-            ),
+            child: Text(val),
           ),
         ),
       ),
@@ -204,7 +212,7 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _execButton() {
     return AlliumButton(
-      onTap: onExec,
+      onTap: _onExec,
       text: "Execute",
       color: Colors.white,
     );
@@ -233,10 +241,7 @@ class _HomeViewState extends State<HomeView> {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             consoleOutputs.join("\n"),
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black,
-            ),
+            style: const TextStyle(fontSize: 14, color: Colors.black),
           ),
         ),
       ),

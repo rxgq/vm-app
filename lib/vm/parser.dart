@@ -21,6 +21,7 @@ final class VirtualMachineParser {
     'out':  0x09,
     'jz':   0x0a,
     'jnz':  0x0b,
+    'in':   0x0c,
   };
 
   VirtualMachineParser({
