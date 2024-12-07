@@ -50,6 +50,8 @@ class _VmOperationsState extends State<VmOperations> {
           children: [
             _opHeader(op.name),
             _opCode(op.opCode),
+            _opDesc(op.description),
+            
             const SizedBox(height: 24),
           ],
         ),
@@ -69,6 +71,15 @@ class _VmOperationsState extends State<VmOperations> {
   Widget _opCode(int code) {
     return Text(
       getHexString(code),
+      style: font(
+        fontSize: 12,
+      ),
+    );
+  }
+
+  Widget _opDesc(String desc) {
+    return Text(
+      desc,
       style: font(
         fontSize: 12,
       ),

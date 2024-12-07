@@ -1,4 +1,3 @@
-import 'package:allium/home/widgets/operations/vm_operations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 
@@ -16,86 +15,70 @@ const double consoleHeight = 140;
 const double vmWidth = 600;
 const double stDoutWidth = 120;
 
-// const Map<String, int> opCodeMap = {
-//     'nop':  0x00,
-//     'hlt':  0x01,
-//     'push': 0x02,
-//     'pop':  0x03,
-//     'add':  0x04,
-//     'sub':  0x05,
-//     'mul':  0x06,
-//     'div':  0x07,
-//     'jmp':  0x08,
-//     'out':  0x09,
-//     'jz':   0x0a,
-//     'jnz':  0x0b,
-//     'in':   0x0c,
-//   };
-
 List<VmOperation> operations = [
     VmOperation(
         name: "nop",
         opCode: 0,
-        description: ""
+        description: "No operation is executed."
     ),
     VmOperation(
         name: "hlt",
         opCode: 1,
-        description: ""
+        description: "Halts the execution of the virtual machine. The program stops running."
     ),
     VmOperation(
         name: "push",
         opCode: 2,
-        description: ""
+        description: "Pushes a value onto the stack."
     ),
     VmOperation(
         name: "pop",
         opCode: 3,
-        description: ""
+        description: "Removes the top value from the stack."
     ),
     VmOperation(
         name: "add",
         opCode: 4,
-        description: ""
+        description: "Adds the top two values on the stack, replacing them with the result."
     ),
     VmOperation(
         name: "sub",
         opCode: 5,
-        description: ""
+        description: "Subtracts the second value on the stack from the top value, replacing them with the result."
     ),
     VmOperation(
         name: "mul",
         opCode: 6,
-        description: ""
+        description: "Multiplies the top two values on the stack, replacing them with the result."
     ),
     VmOperation(
         name: "div",
         opCode: 7,
-        description: ""
+        description: "Divides the second value on the stack by the top value, replacing them with the result."
     ),
     VmOperation(
         name: "jmp",
         opCode: 8,
-        description: ""
+        description: "Unconditionally jumps to a specified memory address in the program."
     ),
     VmOperation(
         name: "out",
         opCode: 9,
-        description: ""
+        description: "Outputs the top value on the stack to the standard output."
     ),
     VmOperation(
         name: "jz",
         opCode: 10,
-        description: ""
+        description: "Jumps to a specified memory address if the top value on the stack is zero."
     ),
     VmOperation(
         name: "jnz",
         opCode: 11,
-        description: ""
+        description: "Jumps to a specified memory address if the top value on the stack is not zero."
     ),
     VmOperation(
         name: "in",
         opCode: 12,
-        description: ""
+        description: "Takes an integer input from the user and pushes it onto the stack."
     ),
 ];

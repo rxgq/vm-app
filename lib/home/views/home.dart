@@ -5,13 +5,13 @@ import 'package:allium/home/widgets/operations/vm_operations.dart';
 import 'package:allium/home/widgets/vm/console.dart';
 import 'package:allium/home/widgets/vm/stack.dart';
 import 'package:allium/home/widgets/vm/stdout.dart';
-import 'package:allium/vm/vm_settings.dart';
+import 'package:allium/vm/machine/vm_settings.dart';
 import 'package:flutter/material.dart';
 import '../../constants.dart';
 import 'package:allium/home/widgets/common/allium_button.dart';
-import 'package:allium/vm/machine.dart';
-import 'package:allium/vm/stack.dart';
-import 'package:allium/vm/value.dart';
+import 'package:allium/vm/machine/machine.dart';
+import 'package:allium/vm/machine/stack.dart';
+import 'package:allium/vm/machine/value.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
