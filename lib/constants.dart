@@ -3,6 +3,8 @@ import 'dart:ui';
 
 import 'vm/models/vm_operation.dart';
 
+const appName = "allium stack machine";
+
 const lightGrey = Color.fromARGB(255, 244, 244, 244);
 
 const font = GoogleFonts.jetBrainsMono;
@@ -68,25 +70,25 @@ List<VmOperation> operations = [
         name: "jmp",
         opCode: 8,
         description: "Unconditionally jumps to a specified memory address in the program.",
-        errorsThrown: []
+        errorsThrown: ["ExpectedArgument"]
     ),
     VmOperation(
         name: "out",
         opCode: 9,
         description: "Outputs the top value on the stack to the standard output.",
-        errorsThrown: []
+        errorsThrown: ["StackUnderflow"]
     ),
     VmOperation(
         name: "jz",
         opCode: 10,
         description: "Jumps to a specified memory address if the top value on the stack is zero.",
-        errorsThrown: []
+        errorsThrown: ["StackUnderflow", "ExpectedArgument"]
     ),
     VmOperation(
         name: "jnz",
         opCode: 11,
         description: "Jumps to a specified memory address if the top value on the stack is not zero.",
-        errorsThrown: []
+        errorsThrown: ["StackUnderflow", "ExpectedArgument"]
     ),
     VmOperation(
         name: "in",

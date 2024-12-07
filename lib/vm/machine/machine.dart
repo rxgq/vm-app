@@ -235,7 +235,9 @@ final class VirtualMachine implements VM {
   VMResult _jz() {
     if (_logInfo) print("JZ");
     
-    if (_stack.isEmpty) return VMResult.stackUnderflow();
+    if (_stack.isEmpty) {
+      return VMResult.stackUnderflow();
+    }
 
     if ((_stack.peek as Number).value != 0) {
       _ip++;

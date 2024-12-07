@@ -22,9 +22,9 @@ class _VmOperationsState extends State<VmOperations> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.only(left: 8),
       child: Container(
-        width: vmWidth + stDoutWidth,
+        width: vmWidth + stDoutWidth + 8,
         decoration: BoxDecoration(
           border: Border.all(color: lightGrey, width: 4),
           borderRadius: BorderRadius.circular(4),
@@ -52,6 +52,14 @@ class _VmOperationsState extends State<VmOperations> {
             _opCode(op.opCode),
             _opDesc(op.description),
             _opThrows(op.errorsThrown),
+
+            const SizedBox(height: 24),
+
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: lightGrey, width: 1)
+              )
+            ),
 
             const SizedBox(height: 24),
           ],
@@ -102,13 +110,20 @@ class _VmOperationsState extends State<VmOperations> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (throws.isEmpty)
+              Text(
+                "  None",
+                style: font(
+                  fontSize: 12,
+                ),
+              ),
             for (var item in throws)
               Text(
                 "  $item",
                 style: font(
                   fontSize: 12,
                 ),
-              )
+              ),
           ],
         )
       ],

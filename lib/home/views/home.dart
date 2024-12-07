@@ -150,54 +150,78 @@ class _HomeViewState extends State<HomeView> {
       backgroundColor: Colors.white,
       body: Center(
         child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 180),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+          child: SizedBox(
+            width: 750,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Column(
                 children: [
-                  Column(
+                  const SizedBox(height: 180),
+              
+                  _title(),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        width: vmWidth,
-                        height: vmHeight,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: lightGrey,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            _vmComponents(),
-                            const Spacer(),
-                            VMStackBox(stackValues: stackValues),
-                          ],
-                        ),
+                      Column(
+                        children: [
+                          Container(
+                            width: vmWidth,
+                            height: vmHeight,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(4),
+                              color: lightGrey,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                _vmComponents(),
+                                const Spacer(),
+                                VMStackBox(stackValues: stackValues),
+                              ],
+                            ),
+                          ),
+                          VMConsole(values: consoleOutputs)
+                        ],
                       ),
-                      VMConsole(values: consoleOutputs)
+                      VMStdout(stdout: stdout),
                     ],
                   ),
-                  VMStdout(stdout: stdout),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: _programDropdown(),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 80),
+                  const VmOperations(),
+                  // _settingDisplay("Execution Speed", execSpeedController)
                 ],
               ),
-              Row(
-                children: [
-                  const SizedBox(width: 94),
-                  _programDropdown()
-                ],
-              ),
-              const SizedBox(height: 80),
-
-              const VmOperations(),
-              // _settingDisplay("Execution Speed", execSpeedController)
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _title() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 24),
+          child: Text(
+            appName,
+            style: font(
+              fontSize: 18
+            ),
+          ),
+        ),
+      ],
     );
   }
 

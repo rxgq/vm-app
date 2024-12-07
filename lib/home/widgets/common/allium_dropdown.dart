@@ -13,7 +13,7 @@ class AlliumDropdown<T> extends StatelessWidget {
     required this.items,
     required this.onChanged,
     this.selectedItem,
-    this.hintText = "Select sample program",
+    this.hintText = "select sample program",
   });
 
   @override
