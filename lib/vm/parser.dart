@@ -6,6 +6,8 @@ final class VirtualMachineParser {
   final String _source;
   final _tokens = <int>[];
 
+  final _labels = <String, int>{};
+
   static const Map<String, int> _opcodeMap = {
     'nop':  0x00,
     'halt': 0x01,
@@ -48,16 +50,32 @@ final class VirtualMachineParser {
 
   VMResult _parseOperation() {
     int start = _current;
-    while (_current < _source.length && _isAlpha(_source[_current])) {
+    while (_current < _source.length && (_isAlpha(_source[_current]) || _source[_current] == ':')) {
       _current++;
     }
 
     final stmt = _source.substring(start, _current);
+    if (stmt[stmt.length - 1] == ':') {
+      return parseLabel(stmt.substring(0, stmt.length - 1));
+    }
+
+    if (_labels.keys.contains(stmt)) {
+      _tokens.add(_labels[stmt]!);
+      return VMResult.ok();
+    }
+
     if (!_opcodeMap.containsKey(stmt)) {
       return VMResult.undefinedOperation(stmt);
     }
 
     _tokens.add(_opcodeMap[stmt]!);
+    return VMResult.ok();
+  }
+
+  VMResult parseLabel(String label) {
+    _tokens.add(0x00);
+    _labels.addAll({label: _tokens.length - 1});
+
     return VMResult.ok();
   }
 

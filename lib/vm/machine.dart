@@ -4,18 +4,15 @@ import 'package:allium/vm/stack.dart';
 import 'package:allium/vm/value.dart';
 
 abstract interface class VM {
-  void execute();
+  void execute(String _program);
 }
 
 final class VirtualMachine implements VM {
 
-  // a string representation of the program loaded into the virtual machine
-  final String _programStr;
-
   // executable bytecode compiled from the program string
-  late final List<int> _program;
+  late List<int> _programBytes;
 
-  // virtual stack
+  // virtual machine stack
   final _stack = VMStack();
 
   // max number of items allowed on the virtual stack
@@ -31,11 +28,16 @@ final class VirtualMachine implements VM {
   late final Map<int, Function> _isa;
 
   // number of instructions to execute per second
-  static const _execSpeed = 32;
+  static const _execSpeed = 16;
+
+  // displays a verbose execution output if 'true'
+  static const bool _logInfo = true;
+
+  final Function(VMStack) emitStack;
 
   VirtualMachine({
-    required String programStr,
-  }) : _programStr = programStr {
+    required this.emitStack,
+  }) {
     _isa = {
       0x00: _nop,
       0x01: _halt,
@@ -53,14 +55,16 @@ final class VirtualMachine implements VM {
   }
 
   @override
-  Future<VMResult> execute() async {
-    final parser = VirtualMachineParser(source: _programStr);
+  Future<VMResult> execute(final String programStr) async {
+    final parser = VirtualMachineParser(source: programStr);
     final result = parser.parse();
 
     if (!result.isSuccess) return result;
-    _program = result.value;
+    _programBytes = result.value;
 
     while (!isEnd() && !_isHalted) {
+      emitStack(_stack);
+
       var result = _eval();
       if (!result.isSuccess) return result;
 
@@ -74,7 +78,7 @@ final class VirtualMachine implements VM {
   }
 
   VMResult _eval() {
-    final instr = _program[_ip];
+    final instr = _programBytes[_ip];
     final handler = _isa[instr];
 
     if (handler == null) {
@@ -85,7 +89,7 @@ final class VirtualMachine implements VM {
   }
 
   bool isEnd() {
-    return _ip >= _program.length;
+    return _ip >= _programBytes.length;
   }
 
   VMResult _nop() {
@@ -93,38 +97,44 @@ final class VirtualMachine implements VM {
   }
 
   VMResult _halt() {
-    print("HALTED");
+    if (_logInfo) print("HALTED");
 
     _isHalted = true;
     return VMResult.ok();
   }
   
   VMResult _push() {
+    if (_logInfo) print("PUSH");
+
     if (_stack.length == _stackLimit) {
       return VMResult.stackOverflow(_stackLimit);
     }
 
     _ip++;
     if (isEnd()) {
-      return VMResult.expectedArgument(_program[_ip - 1]);
+      return VMResult.expectedArgument(_programBytes[_ip - 1]);
     }
 
-    _stack.push(Number(_program[_ip]));
+    _stack.push(Number(_programBytes[_ip]));
     return VMResult.ok();
   }
 
   VMResult _pop() {
+    if (_logInfo) print("POP");
+
     if (_stack.isEmpty) {
       return VMResult.stackUnderflow();
     }
-
     _stack.pop();
+
     return VMResult.ok();
   }
 
   VMResult _add() {
+    if (_logInfo) print("ADD");
+
     if (_stack.length < 2) {
-      return VMResult.expectedStackArgs(2, _program[_ip]);
+      return VMResult.expectedStackArgs(2, _programBytes[_ip]);
     }
 
     final arg1 = _stack.pop() as Number;
@@ -135,8 +145,10 @@ final class VirtualMachine implements VM {
   }
 
   VMResult _sub() {
+    if (_logInfo) print("SUB");
+
     if (_stack.length < 2) {
-      return VMResult.expectedStackArgs(2, _program[_ip]);
+      return VMResult.expectedStackArgs(2, _programBytes[_ip]);
     }
 
     final arg1 = _stack.pop() as Number;
@@ -147,8 +159,10 @@ final class VirtualMachine implements VM {
   }
 
   VMResult _mul() {
+    if (_logInfo) print("MUL");
+
     if (_stack.length < 2) {
-      return VMResult.expectedStackArgs(2, _program[_ip]);
+      return VMResult.expectedStackArgs(2, _programBytes[_ip]);
     }
 
     final arg1 = _stack.pop() as Number;
@@ -159,8 +173,10 @@ final class VirtualMachine implements VM {
   }
 
   VMResult _div() {
+    if (_logInfo) print("DIV");
+
     if (_stack.length < 2) {
-      return VMResult.expectedStackArgs(2, _program[_ip]);
+      return VMResult.expectedStackArgs(2, _programBytes[_ip]);
     }
 
     final arg1 = _stack.pop() as Number;
@@ -175,7 +191,9 @@ final class VirtualMachine implements VM {
   }
 
   VMResult _jmp() {
-    final targetIp = _program[++_ip];
+    if (_logInfo) print("JMP");
+
+    final targetIp = _programBytes[++_ip];
 
     // -1 to account for the offset of the ip++
     // in exec() when this method returns
@@ -185,11 +203,15 @@ final class VirtualMachine implements VM {
   }
 
   VMResult _out() {
-    print((_stack.peek as Number).value);
+    if (_stack.isEmpty) return VMResult.stackUnderflow();
+
+    if (_logInfo) print("OUT: ${(_stack.peek as Number).value}");
     return VMResult.ok();
   }
 
   VMResult _jz() {
+    if (_logInfo) print("JZ");
+    
     if (_stack.isEmpty) return VMResult.stackUnderflow();
 
     if ((_stack.peek as Number).value != 0) {
@@ -202,6 +224,8 @@ final class VirtualMachine implements VM {
   }
 
   VMResult _jnz() {
+    if (_logInfo) print("JNZ");
+
     if (_stack.isEmpty) return VMResult.stackUnderflow();
 
     if ((_stack.peek as Number).value == 0) {
