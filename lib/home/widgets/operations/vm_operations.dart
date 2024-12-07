@@ -51,7 +51,8 @@ class _VmOperationsState extends State<VmOperations> {
             _opHeader(op.name),
             _opCode(op.opCode),
             _opDesc(op.description),
-            
+            _opThrows(op.errorsThrown),
+
             const SizedBox(height: 24),
           ],
         ),
@@ -83,6 +84,34 @@ class _VmOperationsState extends State<VmOperations> {
       style: font(
         fontSize: 12,
       ),
+    );
+  }
+
+  Widget _opThrows(List<String> throws) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          "Throws:",
+          style: font(
+            fontSize: 12,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (var item in throws)
+              Text(
+                "  $item",
+                style: font(
+                  fontSize: 12,
+                ),
+              )
+          ],
+        )
+      ],
     );
   }
 

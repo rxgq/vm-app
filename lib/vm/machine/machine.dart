@@ -209,7 +209,12 @@ final class VirtualMachine implements VM {
   VMResult _jmp() {
     if (_logInfo) print("JMP");
 
-    final targetIp = _programBytes[++_ip];
+    _ip++;
+    if (_ip >= _programBytes.length) {
+      return VMResult.expectedArgument(_programBytes[_ip - 1]);
+    }
+
+    final targetIp = _programBytes[_ip];
 
     // -1 to account for the offset of the ip++
     // in exec() when this method returns
@@ -237,22 +242,22 @@ final class VirtualMachine implements VM {
       return VMResult.ok();
     }
 
-    _jmp();
-    return VMResult.ok();
+    return _jmp();
   }
 
   VMResult _jnz() {
     if (_logInfo) print("JNZ");
 
-    if (_stack.isEmpty) return VMResult.stackUnderflow();
+    if (_stack.isEmpty) {
+      return VMResult.stackUnderflow();
+    }
 
     if ((_stack.peek as Number).value == 0) {
       _ip++;
       return VMResult.ok();
     }
 
-    _jmp();
-    return VMResult.ok();
+    return _jmp();
   }
 
   Future<VMResult> _in() async {
