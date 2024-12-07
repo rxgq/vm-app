@@ -33,10 +33,10 @@ final class VirtualMachine implements VM {
   // displays a verbose execution output if 'true'
   static const bool _logInfo = true;
 
-  final Function(VMStack) emitStack;
+  final Function(VMStack, List<int>) emitData;
 
   VirtualMachine({
-    required this.emitStack,
+    required this.emitData,
   }) {
     _isa = {
       0x00: _nop,
@@ -63,14 +63,13 @@ final class VirtualMachine implements VM {
     _programBytes = result.value;
 
     while (!isEnd() && !_isHalted) {
-      emitStack(_stack);
-
       var result = _eval();
       if (!result.isSuccess) return result;
 
       _ip++;
 
       await Future.delayed(Duration(milliseconds: (1000 / _execSpeed).round()));
+      emitData(_stack, _programBytes);
     }
 
     _stack.dump();

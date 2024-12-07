@@ -15,6 +15,8 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   final codeController = TextEditingController();
+  final byteCodeController = TextEditingController();
+
   final List<String> stackValues = [];
   final List<String> consoleOutputs = [];
 
@@ -30,29 +32,30 @@ class _HomeViewState extends State<HomeView> {
 
   void _initializeVM() {
     vm = VirtualMachine(
-      emitStack: _onStackEmit,
+      emitData: _onDataEmit,
     );
     stackValues.clear();
   }
 
-  void _onStackEmit(VMStack stack) {
+  void _onDataEmit(VMStack stack, List<int> bytes) {
     setState(() {
       stackValues.clear();
       stackValues.addAll(stack.toList()
         .map((item) => (item as Number).value.toString())
       );
+      
+      byteCodeController.text = bytes.join(" ");
     });
   }
 
   void _resetVM() {
     setState(() {
-      codeController.clear();
+      _initializeVM();
       consoleOutputs.clear();
     });
   }
 
   Future onExec() async {
-    _initializeVM();
     var result = await vm.execute(codeController.text);
 
     if (!result.isSuccess) {
@@ -68,6 +71,7 @@ class _HomeViewState extends State<HomeView> {
       backgroundColor: Colors.white,
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               width: 600,
@@ -82,18 +86,23 @@ class _HomeViewState extends State<HomeView> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildCodeField(),
+                      Row(
+                        children: [
+                          _buildTextBox(codeController, hint: "Enter your code here..."),
+                          _buildTextBox(byteCodeController),
+                        ],
+                      ),
                       const Spacer(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _execButton(),
-                          const SizedBox(width: 8),
                           _resetButton(),
                         ],
                       ),
                     ],
                   ),
+
                   const Spacer(),
                   _buildStack(),
                 ],
@@ -109,20 +118,35 @@ class _HomeViewState extends State<HomeView> {
   Widget _buildStack() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Container(
-        width: 140, height: 280,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              for (var val in stackValues)
-                _stackItem(val)
-            ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 8.0),
+            child: Text(
+              "Stack",
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.black
+              ),
+            ),
           ),
-        ),
+          Container(
+            width: 140, height: 238,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  for (var val in stackValues)
+                    _stackItem(val)
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -148,7 +172,7 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _buildCodeField() {
+  Widget _buildTextBox(TextEditingController controller, {String? hint}) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -161,13 +185,13 @@ class _HomeViewState extends State<HomeView> {
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: TextField(
             maxLines: null,
-            controller: codeController,
+            controller: controller,
             style: const TextStyle(
               fontSize: 14,
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: "Enter your code here...",
+              hintText: hint,
               hintStyle: TextStyle(
                 color: Colors.grey[400],
               ),
@@ -199,15 +223,20 @@ class _HomeViewState extends State<HomeView> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
-        width: 600, height: 120,
+        width: 600,
+        height: 120,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           color: lightGrey,
         ),
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(8.0),
           child: Text(
-            consoleOutputs.join("\n")
+            consoleOutputs.join("\n"),
+            style: const TextStyle(
+              fontSize: 14,
+              color: Colors.black,
+            ),
           ),
         ),
       ),
