@@ -84,11 +84,8 @@ class _HomeViewState extends State<HomeView> {
     });
   }
 
-
   void _resetVM() {
-    if (!_isExecuting) return;
-
-    _resetPressed = true;
+    if (_isExecuting) _resetPressed = true;
     _isExecuting = false;
 
     setState(() {
@@ -100,7 +97,10 @@ class _HomeViewState extends State<HomeView> {
 
   Future _onExec() async {
     if (_isExecuting) return;
-    _resetVM();
+
+    _initializeVM();
+    stdout.clear();
+    stackValues.clear();
 
     _isExecuting = true;
     var result = await vm.execute(codeController.text);
