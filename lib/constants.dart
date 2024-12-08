@@ -100,6 +100,12 @@ List<VmOperation> operations = [
         name: "dup",
         opCode: 13,
         description: "Duplicates the value at the top of the stack.",
-        errorsThrown: ["StackUnderflow"]
+        errorsThrown: ["ExpectedStackArgs"]
+    ),
+    VmOperation(
+        name: "swp",
+        opCode: 14,
+        description: "Swaps the top two values at the top of the stack.",
+        errorsThrown: ["ExpectedStackArgs"]
     ),
 ];

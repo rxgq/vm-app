@@ -50,7 +50,7 @@ final class VMResult<T> {
 
   static VMResult expectedStackArgs(int argCount, int op) {
     return _err(VMError(
-      message: "$_errorPrefix expected $argCount values on the stack to execute op: $op"
+      message: "$_errorPrefix expected $argCount value(s) on the stack to execute op: $op"
     ));
   }
 

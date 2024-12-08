@@ -63,6 +63,7 @@ final class VirtualMachine implements VM {
       0x0b: _jnz,
       0x0c: _in,
       0x0d: _dup,
+      0x0e: _swp,
     };
   }
 
@@ -87,7 +88,7 @@ final class VirtualMachine implements VM {
     }
 
     _emit();
-    
+
     _stack.dump();
     return VMResult.ok();
   }
@@ -287,10 +288,26 @@ final class VirtualMachine implements VM {
     if (_logInfo) print("DUP");
 
     if (_stack.isEmpty) {
-      return VMResult.stackUnderflow();
+      return VMResult.expectedStackArgs(1, _programBytes[_ip]);
     }
 
     _stack.push(_stack.peek);
+
+    return VMResult.ok();
+  }
+
+  VMResult _swp() {
+    if (_logInfo) print("SWP");
+
+    if (_stack.length < 2) {
+      return VMResult.expectedStackArgs(2, _programBytes[_ip]);
+    }
+
+    var top = _stack.pop();
+    var belowTop = _stack.pop();
+
+    _stack.push(top);
+    _stack.push(belowTop);
 
     return VMResult.ok();
   }
