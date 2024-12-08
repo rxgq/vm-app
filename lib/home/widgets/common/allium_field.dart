@@ -10,6 +10,7 @@ class AlliumField extends StatefulWidget {
   final bool readonly;
   final String? header;
   final int? maxLength;
+  final bool scrollable;
 
   const AlliumField({
     super.key,
@@ -20,7 +21,8 @@ class AlliumField extends StatefulWidget {
     this.maxLines = 1,
     this.maxLength,
     this.readonly = false,
-    this.header
+    this.header,
+    this.scrollable = false
   });
 
   @override
@@ -39,7 +41,7 @@ class _AlliumFieldState extends State<AlliumField> {
           borderRadius: BorderRadius.circular(4),
           color: Colors.white,
         ),
-        child: widget.header == null ? _textField() : _headerField()
+        child: widget.header == null ? _textField() : _headerField(),
       ),
     );
   }
@@ -53,11 +55,11 @@ class _AlliumFieldState extends State<AlliumField> {
           child: Text(
             widget.header!,
             style: font(
-              fontSize: 12
+              fontSize: 12,
             ),
           ),
         ),
-        _textField()
+        Expanded(child: _scrollableTextField()),
       ],
     );
   }
@@ -74,19 +76,25 @@ class _AlliumFieldState extends State<AlliumField> {
         maxLength: widget.maxLength,
         maxLengthEnforcement: null,
         style: font(
-          fontSize: 12
+          fontSize: 12,
         ),
         decoration: InputDecoration(
           counterText: "",
           fillColor: Colors.white,
           contentPadding: const EdgeInsets.symmetric(
-            vertical: 16.0, 
+            vertical: 16.0,
           ),
           border: InputBorder.none,
           hintText: widget.hintText,
           hintStyle: TextStyle(color: Colors.grey[400]),
         ),
       ),
+    );
+  }
+
+  Widget _scrollableTextField() {
+    return SingleChildScrollView(
+      child: _textField()
     );
   }
 }

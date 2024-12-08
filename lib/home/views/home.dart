@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:allium/home/widgets/common/allium_dropdown.dart';
 import 'package:allium/home/widgets/common/allium_field.dart';
-import 'package:allium/home/widgets/operations/vm_operations.dart';
+import 'package:allium/home/widgets/opcodeDocs/vm_operations.dart';
 import 'package:allium/home/widgets/vm/console.dart';
 import 'package:allium/home/widgets/vm/stack.dart';
+import 'package:allium/home/widgets/vm/stack_code_editor.dart';
 import 'package:allium/home/widgets/vm/stdout.dart';
 import 'package:allium/vm/machine/vm_settings.dart';
 import 'package:allium/vm/utils/program_mapper.dart';
@@ -225,18 +226,56 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
+  Widget _codeField() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Container(
+        width: 120,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4)
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            AlliumField(
+              height: 168,
+              header: "code",
+              maxLines: null,
+              controller: codeController,
+              hintText: "Enter code here..."
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0, bottom: 8),
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {
+                    showDialog(context: context, builder: (context) {
+                      return StackCodeEditor(controller: codeController);
+                    });
+                  },
+                  child: const Icon(
+                    Icons.code,
+                    color: Color.fromARGB(255, 130, 130, 130),
+                    size: 18,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _vmComponents() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            AlliumField(
-              header: "code",
-              maxLines: null,
-              controller: codeController,
-              hintText: "Enter code here..."
-            ),
+            _codeField(),
             AlliumField(
               header: "bytecode",
               width: 292,
@@ -289,6 +328,7 @@ class _HomeViewState extends State<HomeView> {
   Widget _userInputBox() {
     return AlliumField(
       readonly: false,
+      maxLines: 1,
       controller: userInputController,
       width: 100,
       height: buttonHeight,
