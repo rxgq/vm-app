@@ -329,6 +329,7 @@ class _HomeViewState extends State<HomeView> {
     return AlliumField(
       readonly: false,
       maxLines: 1,
+      maxLength: 8,
       controller: userInputController,
       width: 100,
       height: buttonHeight,

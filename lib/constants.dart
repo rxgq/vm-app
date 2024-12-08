@@ -96,4 +96,10 @@ List<VmOperation> operations = [
         description: "Takes an integer input from the user and pushes it onto the stack.",
         errorsThrown: []
     ),
+    VmOperation(
+        name: "dup",
+        opCode: 13,
+        description: "Duplicates the value at the top of the stack.",
+        errorsThrown: ["StackUnderflow"]
+    ),
 ];

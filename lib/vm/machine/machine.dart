@@ -62,6 +62,7 @@ final class VirtualMachine implements VM {
       0x0a: _jz,
       0x0b: _jnz,
       0x0c: _in,
+      0x0d: _dup,
     };
   }
 
@@ -74,11 +75,7 @@ final class VirtualMachine implements VM {
     _programBytes = result.value;
 
     while (!isEnd() && !_isHalted) {
-      var byteCode =  _programBytes
-        .map((byte) => "0x${byte.toRadixString(16)
-        .padLeft(2, '0')}").toList();
-
-      var resetPressed = emitData(_stack, byteCode, _stdout);
+      var resetPressed = _emit();
       if (resetPressed) break;
 
       var result = await _eval();
@@ -89,8 +86,18 @@ final class VirtualMachine implements VM {
       await Future.delayed(Duration(milliseconds: (1000 / _settings.executionSpeed).round()));
     }
 
+    _emit();
+    
     _stack.dump();
     return VMResult.ok();
+  }
+
+  bool _emit() {
+    var byteCode =  _programBytes
+      .map((byte) => "0x${byte.toRadixString(16)
+      .padLeft(2, '0')}").toList();
+
+    return emitData(_stack, byteCode, _stdout);
   }
 
   Future<VMResult> _eval() async {
@@ -273,6 +280,18 @@ final class VirtualMachine implements VM {
     final value = int.tryParse(input) ?? -1;
 
     _stack.push(Number(value));
+    return VMResult.ok();
+  }
+
+  VMResult _dup() {
+    if (_logInfo) print("DUP");
+
+    if (_stack.isEmpty) {
+      return VMResult.stackUnderflow();
+    }
+
+    _stack.push(_stack.peek);
+
     return VMResult.ok();
   }
 }
