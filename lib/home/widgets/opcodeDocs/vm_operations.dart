@@ -10,7 +10,7 @@ class VmOperations extends StatefulWidget {
 }
 
 class _VmOperationsState extends State<VmOperations> {
-  List<VmOperation> sortedOpCodes = [];
+  List<VMOperation> sortedOpCodes = [];
 
   @override
   void initState() {
@@ -41,7 +41,7 @@ class _VmOperationsState extends State<VmOperations> {
     );
   }
 
-  Widget _opCodeInfo(VmOperation op) {
+  Widget _opCodeInfo(VMOperation op) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: SizedBox(

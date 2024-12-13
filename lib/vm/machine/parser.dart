@@ -58,7 +58,7 @@ final class VirtualMachineParser {
     return VMResult.ok(value: _tokens);
   }
 
-  VMResult _parseLabel(int _currentToken) {
+  VMResult _parseLabel(int currentToken) {
     int start = _current;
     while (_current < _source.length && (_isAlpha(_source[_current]) || _source[_current] == ':')) {
       _current++;
@@ -66,7 +66,7 @@ final class VirtualMachineParser {
 
     final stmt = _source.substring(start, _current);
     if (stmt[stmt.length - 1] == ':') {
-      return parseLabel(stmt.substring(0, stmt.length - 1), _currentToken);
+      return parseLabel(stmt.substring(0, stmt.length - 1), currentToken);
     }
 
     return VMResult.ok();
@@ -87,6 +87,15 @@ final class VirtualMachineParser {
 
     if (_labels.keys.contains(stmt)) {
       _tokens.add(_labels[stmt]!);
+      return VMResult.ok();
+    }
+
+    final macro = macros.where((x) => x.commandName == stmt).firstOrNull;
+    if (macro != null) {
+      for (final op in macro.operations) {
+        _tokens.add(op.opCode);
+      }
+
       return VMResult.ok();
     }
 
