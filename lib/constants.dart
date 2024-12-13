@@ -1,11 +1,10 @@
-import 'package:allium/home/widgets/opcodeDocs/vm_operations.dart';
-import 'package:allium/vm/machine/vm_macro.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:ui';
 
+import 'vm/machine/vm_macro.dart';
 import 'vm/models/vm_operation.dart';
 
-const appName = "allium stack machine";
+const appName = "griffin stack machine";
 
 const lightGrey = Color.fromARGB(255, 244, 244, 244);
 
@@ -144,9 +143,9 @@ List<VMOperation> operations = [
 
 List<VMMacro> macros = [
   VMMacro(
-    commandName: "outfive", 
+    commandName: "outfive",
     operations: [
       _out, _out, _out, _out, _out
     ]
-  )
+  ),
 ];

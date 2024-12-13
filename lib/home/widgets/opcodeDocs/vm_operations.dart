@@ -1,6 +1,7 @@
-import 'package:allium/constants.dart';
-import 'package:allium/vm/models/vm_operation.dart';
 import 'package:flutter/material.dart';
+
+import '../../../constants.dart';
+import '../../../vm/models/vm_operation.dart';
 
 class VmOperations extends StatefulWidget {
   const VmOperations({super.key});

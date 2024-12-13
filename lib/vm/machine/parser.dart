@@ -1,5 +1,4 @@
-import 'package:allium/constants.dart';
-
+import '../../constants.dart';
 import 'result.dart';
 
 final class VirtualMachineParser {

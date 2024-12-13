@@ -1,4 +1,4 @@
-import 'package:allium/vm/models/vm_operation.dart';
+import '../models/vm_operation.dart';
 
 final class VMMacro {
   final String commandName;

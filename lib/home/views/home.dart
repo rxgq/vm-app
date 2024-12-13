@@ -1,20 +1,23 @@
+
+
 import 'dart:async';
 
-import 'package:allium/home/widgets/common/allium_dropdown.dart';
-import 'package:allium/home/widgets/common/allium_field.dart';
-import 'package:allium/home/widgets/opcodeDocs/vm_operations.dart';
-import 'package:allium/home/widgets/vm/console.dart';
-import 'package:allium/home/widgets/vm/stack.dart';
-import 'package:allium/home/widgets/vm/stack_code_editor.dart';
-import 'package:allium/home/widgets/vm/stdout.dart';
-import 'package:allium/vm/machine/vm_settings.dart';
-import 'package:allium/vm/utils/program_mapper.dart';
 import 'package:flutter/material.dart';
+import 'package:griffin/home/widgets/common/griffin_button.dart';
+import 'package:griffin/home/widgets/common/griffin_dropdown.dart';
+import 'package:griffin/home/widgets/common/griffin_field.dart';
+
 import '../../constants.dart';
-import 'package:allium/home/widgets/common/allium_button.dart';
-import 'package:allium/vm/machine/machine.dart';
-import 'package:allium/vm/machine/stack.dart';
-import 'package:allium/vm/machine/value.dart';
+import '../../vm/machine/machine.dart';
+import '../../vm/machine/stack.dart';
+import '../../vm/machine/value.dart';
+import '../../vm/machine/vm_settings.dart';
+import '../../vm/utils/program_mapper.dart';
+import '../widgets/opcodeDocs/vm_operations.dart';
+import '../widgets/vm/console.dart';
+import '../widgets/vm/stack.dart';
+import '../widgets/vm/stack_code_editor.dart';
+import '../widgets/vm/stdout.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -238,7 +241,7 @@ class _HomeViewState extends State<HomeView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            AlliumField(
+            GriffinField(
               height: 168,
               header: "code",
               maxLines: null,
@@ -276,7 +279,7 @@ class _HomeViewState extends State<HomeView> {
         Row(
           children: [
             _codeField(),
-            AlliumField(
+            GriffinField(
               header: "bytecode",
               width: 292,
               maxLines: null,
@@ -302,7 +305,7 @@ class _HomeViewState extends State<HomeView> {
   Widget _programDropdown() {
     return SizedBox(
       width: 220, height: 40,
-      child: AlliumDropdown(
+      child: GriffinDropdown(
         items: const ["cat program", "decrement counter"], 
         onChanged: (item) {
           codeController.text = ProgramMapper.mapProgramString(item ?? "");
@@ -312,7 +315,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _userInputButton() {
-    return AlliumButton(
+    return GriffinButton(
       width: 40,
       color: Colors.white,
       onTap: () {
@@ -326,7 +329,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _userInputBox() {
-    return AlliumField(
+    return GriffinField(
       readonly: false,
       maxLines: 1,
       maxLength: 8,
@@ -337,7 +340,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _execButton() {
-    return AlliumButton(
+    return GriffinButton(
       onTap: _onExec,
       text: "Execute",
       color: Colors.white,
@@ -345,7 +348,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _resetButton() {
-    return AlliumButton(
+    return GriffinButton(
       onTap: _resetVM,
       text: "Reset",
       color: const Color.fromARGB(255, 253, 175, 169),
@@ -387,7 +390,7 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
           ),
-          AlliumField(
+          GriffinField(
             maxLength: 3,
             maxLines: 1,
             width: 80,

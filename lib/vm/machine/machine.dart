@@ -1,8 +1,9 @@
-import 'package:allium/vm/machine/parser.dart';
-import 'package:allium/vm/machine/result.dart';
-import 'package:allium/vm/machine/stack.dart';
-import 'package:allium/vm/machine/value.dart';
-import 'package:allium/vm/machine/vm_settings.dart';
+import 'package:griffin/vm/machine/parser.dart';
+import 'package:griffin/vm/machine/stack.dart';
+
+import 'result.dart';
+import 'value.dart';
+import 'vm_settings.dart';
 
 abstract interface class VM {
   void execute(String program);

@@ -1,5 +1,6 @@
-import 'package:allium/home/views/home.dart';
 import 'package:flutter/material.dart';
+
+import 'home/views/home.dart';
 
 void main() {
   runApp(const App());
