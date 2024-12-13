@@ -1,6 +1,6 @@
 # Allium
 
-A stack-based virtual machine that compiles into bytecode
+A stack-based virtual machine that compiles into bytecode and supports the creation of custom stack macro commands.
 
 <br/>
 
